@@ -91,7 +91,7 @@ public:
 			throw std::runtime_error{ e.msg };
 		}
 
-		return{ fmParallel, 1 };
+		return{ fmParallel, 0 };
 	}
 
 	std::pair<const ::VSVideoInfo *, size_t> get_video_info() noexcept override
