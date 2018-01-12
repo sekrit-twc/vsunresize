@@ -29,11 +29,11 @@ zimg_pixel_type_e translate_type(const ::VSFormat &vsformat)
 
 class VSUnresize : public vsxx::FilterBase {
 	FilterNode m_clip;
-	std::unique_ptr<zimgxx::FilterGraph> m_graph;
+	zimgxx::FilterGraph m_graph;
 	VSVideoInfo m_vi;
 	size_t m_tmp_size;
 public:
-	explicit VSUnresize(void *) : m_tmp_size{} {}
+	explicit VSUnresize(void *) : m_graph{ nullptr }, m_vi{}, m_tmp_size {} {}
 
 	const char *get_name(int) noexcept override { return "Unresize"; }
 
@@ -85,8 +85,8 @@ public:
 		m_vi.height = dst_format.height;
 
 		try {
-			m_graph.reset(new zimgxx::FilterGraph{ zimgxx::FilterGraph::build(src_format, dst_format, &params) });
-			m_tmp_size = m_graph->get_tmp_size();
+			m_graph = zimgxx::FilterGraph{ zimgxx::FilterGraph::build(src_format, dst_format, &params) };
+			m_tmp_size = m_graph.get_tmp_size();
 		} catch (const zimgxx::zerror &e) {
 			throw std::runtime_error{ e.msg };
 		}
@@ -129,7 +129,7 @@ public:
 		}
 
 		try {
-			m_graph->process(src_buf, dst_buf, tmp.get());
+			m_graph.process(src_buf, dst_buf, tmp.get());
 		} catch (const zimgxx::zerror &e) {
 			throw std::runtime_error{ e.msg };
 		}
