@@ -21,25 +21,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\vsxx\VapourSynth.h">
-      <Filter>Header Files\vsxx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\vsxx\VapourSynth++.hpp">
-      <Filter>Header Files\vsxx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\vsxx\VSHelper.h">
-      <Filter>Header Files\vsxx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\vsxx\vsxx_pluginmain.h">
-      <Filter>Header Files\vsxx</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\vsxx\vsxx_pluginmain.cpp">
-      <Filter>Source Files\vsxx</Filter>
-    </ClCompile>
     <ClCompile Include="vsunresize.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\rawz\vsxx\vsxx4_pluginmain.cpp">
+      <Filter>Source Files\vsxx</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\rawz\vsxx\VapourSynth4++.hpp">
+      <Filter>Header Files\vsxx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\rawz\vsxx\vsxx4_pluginmain.h">
+      <Filter>Header Files\vsxx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\rawz\vsxx\vapoursynth\VapourSynth4.h">
+      <Filter>Header Files\vsxx</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

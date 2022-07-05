@@ -27,26 +27,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -74,7 +74,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)vsxx;$(SolutionDir)zimg\src\zimg\api</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)vsxx;$(SolutionDir)vsxx\vapoursynth;$(SolutionDir)zimg\src\zimg\api</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>z.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -86,7 +86,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)vsxx;$(SolutionDir)zimg\src\zimg\api</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)vsxx;$(SolutionDir)vsxx\vapoursynth;$(SolutionDir)zimg\src\zimg\api</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <AdditionalDependencies>z.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -100,7 +100,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)vsxx;$(SolutionDir)zimg\src\zimg\api</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)vsxx;$(SolutionDir)vsxx\vapoursynth;$(SolutionDir)zimg\src\zimg\api</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -116,7 +116,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)vsxx;$(SolutionDir)zimg\src\zimg\api</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)vsxx;$(SolutionDir)vsxx\vapoursynth;$(SolutionDir)zimg\src\zimg\api</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -126,14 +126,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\vsxx\VapourSynth++.hpp" />
-    <ClInclude Include="..\vsxx\VapourSynth.h" />
-    <ClInclude Include="..\vsxx\VSHelper.h" />
-    <ClInclude Include="..\vsxx\vsxx_pluginmain.h" />
+    <ClCompile Include="..\..\rawz\vsxx\vsxx4_pluginmain.cpp" />
+    <ClCompile Include="vsunresize.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\vsxx\vsxx_pluginmain.cpp" />
-    <ClCompile Include="vsunresize.cpp" />
+    <ClInclude Include="..\..\rawz\vsxx\VapourSynth4++.hpp" />
+    <ClInclude Include="..\..\rawz\vsxx\vapoursynth\VapourSynth4.h" />
+    <ClInclude Include="..\..\rawz\vsxx\vsxx4_pluginmain.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

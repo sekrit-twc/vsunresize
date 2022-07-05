@@ -4,13 +4,14 @@
 #include <string>
 #include <utility>
 #include <zimg++.hpp>
-#include "vsxx_pluginmain.h"
+#include "VSHelper4.h"
+#include "vsxx4_pluginmain.h"
 
-using namespace vsxx;
+using namespace vsxx4;
 
 namespace {
 
-zimg_pixel_type_e translate_type(const ::VSFormat &vsformat)
+zimg_pixel_type_e translate_type(const VSVideoFormat &vsformat)
 {
 	if (vsformat.sampleType == stInteger && vsformat.bytesPerSample == 1)
 		return ZIMG_PIXEL_BYTE;
@@ -27,17 +28,17 @@ zimg_pixel_type_e translate_type(const ::VSFormat &vsformat)
 } // namespace
 
 
-class VSUnresize : public vsxx::FilterBase {
+class VSUnresize : public FilterBase {
 	FilterNode m_clip;
 	zimgxx::FilterGraph m_graph;
 	VSVideoInfo m_vi;
 	size_t m_tmp_size;
 public:
-	explicit VSUnresize(void *) : m_graph{ nullptr }, m_vi{}, m_tmp_size {} {}
+	VSUnresize(void * = nullptr) : m_graph{ nullptr }, m_vi{}, m_tmp_size {} {}
 
-	const char *get_name(int) noexcept override { return "Unresize"; }
+	const char *get_name(void *) noexcept override { return "Unresize"; }
 
-	std::pair<::VSFilterMode, int> init(const ConstPropertyMap &in, const PropertyMap &out, const VapourCore &core) override
+	void init(const ConstMap &in, const Map &out, const Core &core) override
 	{
 		FilterNode clip = in.get_prop<FilterNode>("clip");
 		int width = in.get_prop<int>("width");
@@ -47,17 +48,17 @@ public:
 		double src_top = in.get_prop<double>("src_top", map::Ignore{});
 
 		const ::VSVideoInfo &vi = clip.video_info();
-		if (!isConstantFormat(&vi))
+		if (!vsh::isConstantVideoFormat(&vi))
 			throw std::runtime_error{ "clip must be constant format" };
 
 		zimgxx::zimage_format src_format;
 		src_format.width = vi.width;
 		src_format.height = vi.height;
-		src_format.pixel_type = translate_type(*vi.format);
-		src_format.subsample_w = vi.format->subSamplingW;
-		src_format.subsample_h = vi.format->subSamplingH;
-		src_format.color_family = vi.format->colorFamily == cmGray ? ZIMG_COLOR_GREY : ZIMG_COLOR_YUV;
-		src_format.depth = vi.format->bitsPerSample;
+		src_format.pixel_type = translate_type(vi.format);
+		src_format.subsample_w = vi.format.subSamplingW;
+		src_format.subsample_h = vi.format.subSamplingH;
+		src_format.color_family = vi.format.colorFamily == cfGray ? ZIMG_COLOR_GREY : ZIMG_COLOR_YUV;
+		src_format.depth = vi.format.bitsPerSample;
 		src_format.pixel_range = ZIMG_RANGE_LIMITED;
 
 		if (chromaloc == "jpeg" || chromaloc == "mpeg1" || chromaloc == "center")
@@ -76,6 +77,7 @@ public:
 		dst_format.active_region = { NAN, NAN, NAN, NAN };
 
 		zimgxx::zfilter_graph_builder_params params;
+		params.cpu_type = ZIMG_CPU_AUTO_64B;
 		params.resample_filter = static_cast<zimg_resample_filter_e>(-1);
 
 		m_clip = std::move(clip);
@@ -91,34 +93,29 @@ public:
 			throw std::runtime_error{ e.msg };
 		}
 
-		return{ fmParallel, 0 };
+		create_video_filter(out, m_vi, fmParallel, simple_dep(m_clip, rpStrictSpatial), core);
 	}
 
-	std::pair<const ::VSVideoInfo *, size_t> get_video_info() noexcept override
+	ConstFrame get_frame_initial(int n, const Core &core, const FrameContext &frame_context, void *) override
 	{
-		return{ &m_vi, 1 };
+		frame_context.request_frame(n, m_clip);
+		return nullptr;
 	}
 
-	ConstVideoFrame get_frame_initial(int n, const VapourCore &, ::VSFrameContext *frame_ctx) override
+	ConstFrame get_frame(int n, const Core &core, const FrameContext &frame_context, void *) override
 	{
-		m_clip.request_frame_filter(n, frame_ctx);
-		return ConstVideoFrame{};
-	}
-
-	ConstVideoFrame get_frame(int n, const VapourCore &core, ::VSFrameContext *frame_ctx) override
-	{
-		ConstVideoFrame src = m_clip.get_frame_filter(n, frame_ctx);
-		std::unique_ptr<void, void(*)(void *)> tmp(vs_aligned_malloc(m_tmp_size, 32), vs_aligned_free);
+		ConstFrame src = frame_context.get_frame(n, m_clip);
+		std::unique_ptr<void, decltype(&vsh::vsh_aligned_free)> tmp(vsh::vsh_aligned_malloc(m_tmp_size, 64), vsh::vsh_aligned_free);
 
 		if (!tmp)
 			throw std::runtime_error{ "error allocating temporary buffer" };
 
-		VideoFrame dst = core.new_video_frame(*m_vi.format, m_vi.width, m_vi.height, src);
+		Frame dst = core.new_video_frame(m_vi.format, m_vi.width, m_vi.height, src);
 
 		zimgxx::zimage_buffer_const src_buf;
 		zimgxx::zimage_buffer dst_buf;
 
-		for (int p = 0; p < m_vi.format->numPlanes; ++p) {
+		for (int p = 0; p < m_vi.format.numPlanes; ++p) {
 			src_buf.data(p) = src.read_ptr(p);
 			src_buf.stride(p) = src.stride(p);
 			src_buf.mask(p) = ZIMG_BUFFER_MAX;
@@ -138,9 +135,10 @@ public:
 	}
 };
 
-const PluginInfo g_plugin_info{
-	"vsunresize", "unresize", "ghostbusters_2016",
+const PluginInfo4 g_plugin_info4{
+	"vsunresize", "unresize", "ghostbusters_2016", 0,
 	{
-		{ vsxx::FilterBase::filter_create<VSUnresize>, "Unresize", "clip:clip;width:int;height:int;chromaloc:data:opt;src_left:float:opt;src_top:float:opt;" }
+		{ &FilterBase::filter_create<VSUnresize>, "Unresize",
+			"clip:vnode;width:int;height:int;chromaloc:data:opt;src_left:float:opt;src_top:float:opt;", "clip:vnode;" }
 	}
 };
